@@ -193,6 +193,8 @@ public class ReprocessInstagram extends AbstractProcessor {
                     }
                 });
 
+                flowFile = processedFlowfile;
+                flowFile = session.putAttribute(flowFile, "mime.type", "application/json");
                 session.transfer(processedFlowfile, REL_SUCCESS);
 
             } else{
@@ -276,12 +278,14 @@ public class ReprocessInstagram extends AbstractProcessor {
                         outputStream.write(finalJsonString.getBytes(StandardCharsets.UTF_8));
                     }
                 });
-
-                session.transfer(transformedFlowFile, REL_SUCCESS);
+                transformedFlowFile = session.putAttribute(transformedFlowFile, "mime.type", "application/json");
+                flowFile = transformedFlowFile;
+                session.transfer(flowFile, REL_SUCCESS);
             }
 
         } catch (Exception e){
             log.error("ERROR : "+e.getMessage());
+            flowFile = session.putAttribute(flowFile, "mime.type", "application/json");
             session.transfer(flowFile, REL_FAILURE);
         }
 
